@@ -1,0 +1,338 @@
+#LOGIN.PY
+from tkinter import *
+
+
+def saveToFile():
+    saveFirstName = firstNameEntry.get()
+    saveLastName = lastNameEntry.get()
+    saveEmail  = email.get()
+    savePhone = phone.get()
+    
+
+
+    file = open(r"C:\Users\Akarshan\Python App\Data.txt","a+")
+    file.write(saveFirstName)
+    file.write(',')
+    file.write(saveLastName)
+    file.write(',')
+    pass
+    file.write(',')
+    file.write(saveEmail)
+    file.write(',')
+    file.write(savePhone)
+    file.write(',')
+  
+
+
+    file.close()
+
+    firstNameEntry.delete(0,END)
+    lastNameEntry.delete(0,END)
+    email.delete(0,END)
+    phone.delete(0,END)
+    
+
+
+
+
+root = Tk()
+root.geometry("270x300")
+
+firstName = Label(root, text='First Name: ', fg='black')
+firstName.grid(row=0,sticky='E')
+lastName = Label(root,text='Last Name: ', fg='black')
+lastName.grid(row=1,sticky='E')
+email = Label(root,text='Email: ',fg='black')
+email.grid(row=4,sticky='E')
+phone = Label(root, text='Phone No: ', fg='black')
+phone.grid(row=5,sticky='E')
+
+firstNameEntry = Entry()
+lastNameEntry = Entry()
+email = Entry()
+phone = Entry()
+
+
+
+firstNameEntry.grid(row=0,column=1)
+lastNameEntry.grid(row=1,column=1)
+email.grid(row=4,column=1)
+phone.grid(row=5,column=1)
+
+submitButton = Button(root,text='Submit ',command=saveToFile,bg='orange',fg='black')
+submitButton.place(x=60,y=220,width=150)
+#submitButton.grid(row=8,column=1,ipadx=40,ipady=10)
+root.quit
+
+quitButton = Button(root, text='Quit',bg='orange',fg='black' ,command=root.quit)
+quitButton.place(x=60,y=260,width=150)
+
+
+root.mainloop()
+
+#LANGUAGE.PY
+import wx
+
+class MyFrame(wx.Frame):
+    def __init__(self, parent, id=wx.ID_ANY, title="", pos=wx.DefaultPosition, size=(300, 150)):
+        super(MyFrame, self).__init__(parent, id, title, pos, size)
+
+        panel = wx.Panel(self)
+
+        # Create a list of options for the dropdown menu
+        choices = ["Bengali", "Gujurati", "Hindi", "Kannada", "Malayalam", "Marathi", "Tamil", "Telugu", "Urdu"]
+
+        # Create a dropdown menu
+        self.dropdown = wx.Choice(panel, choices=choices)
+
+        # Bind an event handler to the dropdown menu
+        self.Bind(wx.EVT_CHOICE, self.on_dropdown_select, self.dropdown)
+
+    def on_dropdown_select(self, event):
+        selected_option = self.dropdown.GetString(self.dropdown.GetSelection())
+
+        # Save the selected option to a text file
+        with open("selected_option.txt", "w") as file:
+            file.write(selected_option)
+
+        wx.MessageBox("Your language has been saved.", "Language Saved")
+
+if __name__ == "__main__":
+    app = wx.App(False)
+    frame = MyFrame(None, title="Choose the language to be displayed", size=(300, 150))
+    frame.Show()
+    app.MainLoop()
+
+#DROPDOWN.PY
+import wx
+
+class MyFrame(wx.Frame):
+    def __init__(self, parent, id=wx.ID_ANY, title="", pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
+        super(MyFrame, self).__init__(parent, id, title, pos, size, style)
+        
+        panel = wx.Panel(self)
+        
+        
+        choices = ["Weather ", "Arrival", "Departure", "Announcements"]
+          # Create a dropdown menu
+        self.dropdown = wx.Choice(panel, choices=choices)
+
+        # Bind an event handler to the dropdown menu
+        self.Bind(wx.EVT_CHOICE, self.on_dropdown_select, self.dropdown)
+
+    def on_dropdown_select(self, event):
+        selected_option = self.dropdown.GetString(self.dropdown.GetSelection())
+
+        # Save the selected option to a text file
+        with open("Chosen_Information.txt", "w") as file:
+            file.write(selected_option)
+
+        wx.MessageBox("Redirecting.", "Option selected")
+        
+        
+
+if __name__ == "__main__":
+    app = wx.App(False)
+    frame = MyFrame(None, title="Choose your Information Type", size=(300, 150))
+    frame.Show()
+    app.MainLoop()
+
+#KEYWORDS.PY
+f = open('selected_option.txt', 'r+')
+a = f.readline()
+print(a)
+a = a.lower()
+
+if a == 'bengali':
+    s = 'bn'
+elif a == 'gujarati':
+    s = 'gu'
+elif a == 'hindi':
+    s = 'hi'
+elif a == 'kannada':
+    s = 'kn'
+elif a == 'malayalam':
+    s = 'ml'
+elif a == 'marathi':
+    s = 'mr'
+elif a == 'tamil':
+    s = 'ta'
+elif a == 'telugu':
+    s = 'te'
+elif a == 'urdu':
+    s = 'ur'
+
+kw = s
+f.close()
+
+info = input("Enter the announcement: ")
+
+from googletrans import Translator
+
+def translate_text(text, target_language):
+    translator = Translator()
+    translated_text = translator.translate(text, dest=target_language)
+    return translated_text.text
+
+# Example usage
+english_text = info
+target_language = kw  # Change "es" to your target language code (e.g., "fr" for French)
+translated_text = translate_text(english_text, target_language)
+print(f"English: {english_text}")
+print(f"Translated ({target_language}): {translated_text}")
+
+# Save the translated text in a text file
+output_file = open('translated_text.txt', 'w', encoding='utf-8')  # Open the file for writing
+output_file.write(f"English: {english_text}\n")
+output_file.write(f"Translated ({target_language}): {translated_text}\n")
+output_file.close()
+
+
+#WEATHER.PY
+import requests
+import tkinter as tk
+
+# Replace 'YOUR_API_KEY' with your actual weatherapi.com API key
+API_KEY = '0b723cdac503424aac1173052231310'
+BASE_URL = 'https://api.weatherapi.com/v1/current.json'
+
+def get_weather(city_name):
+    params = {
+        'key': API_KEY,
+        'q': city_name,
+    }
+
+    response = requests.get(BASE_URL, params=params)
+
+    if response.status_code == 200:
+        weather_data = response.json()
+        temperature = weather_data['current']['temp_c']
+        condition = weather_data['current']['condition']['text']
+        return f"Weather in {city_name}:\nTemperature: {temperature}°C\nCondition: {condition}"
+    else:
+        return f"Failed to retrieve weather data for {city_name}"
+
+def display_weather():
+    city_name = city_entry.get()
+    weather_info = get_weather(city_name)
+    result_label.config(text=weather_info)
+
+# Create a Tkinter window
+root = tk.Tk()
+root.title("Weather Information")
+
+# Create and configure widgets
+city_label = tk.Label(root, text="Enter city name:")
+city_entry = tk.Entry(root)
+get_weather_button = tk.Button(root, text="Get Weather", command=display_weather)
+result_label = tk.Label(root, text="Weather information will be displayed here.")
+
+# Place widgets in the window
+city_label.pack()
+city_entry.pack()
+get_weather_button.pack()
+result_label.pack()
+
+# Start the main loop
+root.mainloop()
+
+#TEXTTOVIDEO.PY
+from moviepy.editor import VideoFileClip, ImageSequenceClip, vfx, CompositeVideoClip, AudioFileClip
+import cv2
+import pyttsx3
+import threading
+import time
+
+# Load the translated text from the file with the 'utf-8' encoding
+with open('translated_text.txt', 'r', encoding='utf-8') as f:
+    translated_text = f.read()
+
+# Split the text by the line break to separate English and translated text
+english_text, _ = translated_text.split('\n', 1)
+
+# Convert English text to lowercase
+english_text = english_text.lower()
+
+def text_to_speech(text, audio_filename, speed_factor, volume=1.0):
+    engine = pyttsx3.init()
+    engine.save_to_file(text, audio_filename)
+    engine.runAndWait()
+
+    # Load the generated audio clip and adjust the volume
+    audio_clip = AudioFileClip(audio_filename)
+    audio_clip = audio_clip.volumex(volume)
+
+    # Slow down the audio
+    slowed_audio = audio_clip.fx(vfx.speedx, speed_factor)
+
+    # Create a loop of the slowed audio
+    looped_audio = slowed_audio.fx(vfx.loop, duration=audio_clip.duration * 3)
+
+    return looped_audio
+
+# Function to display the GIF at a specific speed
+def display_gif(gif_clip, speed_factor):
+    for frame in gif_clip.iter_frames(fps=gif_clip.fps * speed_factor):
+        cv2.imshow("Slowed GIF", frame)
+        if cv2.waitKey(20) & 0xFF == ord('q'):
+            break
+
+# Load the original GIF
+gif_clip = VideoFileClip(r"C:\Users\Akarshan\Python App\aigif.gif")
+
+# Define how many times you want to repeat the GIF
+repeat_count = 3  # Repeat three times
+
+# Duplicate the GIF frames
+repeated_frames = [frame for frame in gif_clip.iter_frames()]
+
+# Create an ImageSequenceClip from the list of frames
+repeated_gif = ImageSequenceClip(repeated_frames, fps=gif_clip.fps)
+
+# Save the repeated GIF to a file
+repeated_gif.write_gif("repeated.gif")
+
+# Load the repeated GIF
+repeated_gif_clip = VideoFileClip("repeated.gif")
+
+# Slow down the GIF by a factor (e.g., 2x slower)
+slowed_gif_clip = repeated_gif_clip.fx(vfx.speedx, factor=0.5)  # Factor less than 1 to slow down
+
+# Create a thread for text-to-speech with increased volume
+tts_thread = threading.Thread(target=text_to_speech, args=(english_text, "output_audio.mp3", 0.5, 2.0))  # Adjust the speed factor and volume as needed
+tts_thread.start()
+
+# Get the duration of the spoken message
+message_duration = gif_clip.duration * 3  # Adjust this based on your repeat_count
+
+# Calculate the speed factor to match the GIF duration with the message duration
+speed_factor = message_duration / gif_clip.duration
+
+# Display the GIF at the adjusted speed
+display_gif(slowed_gif_clip, speed_factor)
+# Close the OpenCV window when the text-to-speech is complete
+tts_thread.join()
+cv2.destroyAllWindows()
+
+# Load the video
+video_clip = VideoFileClip(r"C:\Users\Akarshan\Python App\Video.mp4")
+
+# Calculate the center for circular motion
+center_x = video_clip.size[0] / 2 - slowed_gif_clip.size[0] / 2
+center_y = video_clip.size[1] / 2
+
+# Apply circular motion to the GIF
+rotated_gif_clip = slowed_gif_clip.set_position((center_x, center_y)).set_duration(video_clip.duration)
+
+# Load the text-to-speech audio
+tts_audio = text_to_speech(english_text, "output_audio.mp3", 1, 2.0)  # Adjust the speed factor and volume as needed
+
+# Combine the video and the rotated GIF with looped text-to-speech audio
+final_video_clip = CompositeVideoClip([video_clip.set_duration(video_clip.duration), rotated_gif_clip])
+
+# Set the audio of the final video to the looped text-to-speech audio
+final_video_clip = final_video_clip.set_audio(tts_audio)
+
+# Write the final video with looped, slowed-down text-to-speech audio
+final_video_clip.write_videofile("output_sample.mp4", fps=video_clip.fps, codec='libx264', audio_codec='aac')
+
